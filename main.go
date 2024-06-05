@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/mrdkvcs/go-base-backend/internal/database"
 	"net/http"
 	"os"
