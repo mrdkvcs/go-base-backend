@@ -4,6 +4,14 @@ github.com/google/uuid
 # github.com/joho/godotenv v1.5.1
 ## explicit; go 1.12
 github.com/joho/godotenv
+# github.com/jub0bs/cors v0.2.0
+## explicit; go 1.22
+github.com/jub0bs/cors
+github.com/jub0bs/cors/internal/headers
+github.com/jub0bs/cors/internal/methods
+github.com/jub0bs/cors/internal/origins
+github.com/jub0bs/cors/internal/origins/radix
+github.com/jub0bs/cors/internal/util
 # github.com/lib/pq v1.10.9
 ## explicit; go 1.13
 github.com/lib/pq
@@ -13,3 +21,14 @@ github.com/lib/pq/scram
 ## explicit; go 1.18
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/blowfish
+# golang.org/x/net v0.25.0
+## explicit; go 1.18
+golang.org/x/net/http/httpguts
+golang.org/x/net/idna
+golang.org/x/net/publicsuffix
+# golang.org/x/text v0.16.0
+## explicit; go 1.18
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm

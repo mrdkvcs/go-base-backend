@@ -16,6 +16,105 @@ type User struct {
 	ApiKey       string    `json:"api_key"`
 }
 
+type Activity struct {
+	ActivityID uuid.UUID `json:"activity_id"`
+	Name       string    `json:"name"`
+	Points     int32     `json:"points"`
+	Type       string    `json:"type"`
+}
+
+type ActivityLog struct {
+	ID         uuid.UUID `json:"id"`
+	UserID     uuid.UUID `json:"user_id"`
+	ActivityID uuid.UUID `json:"activity_id"`
+	Duration   int32     `json:"duration"`
+	Points     int32     `json:"points"`
+	LoggedAt   time.Time `json:"logged_at"`
+	StartTime  time.Time `json:"start_time"`
+	EndTime    time.Time `json:"end_time"`
+}
+type DailyActivityLog struct {
+	ActivityID   uuid.UUID   `json:"activity_id"`
+	Points       int32       `json:"points"`
+	Duration     int32       `json:"duration"`
+	StartTime    string      `json:"start_time"`
+	EndTime      string      `json:"end_time"`
+	ActivityName interface{} `json:"activity_name"`
+}
+
+type TotalAndAveragePoints struct {
+	TotalPoints   string `json:"total_points"`
+	AveragePoints string `json:"average_points"`
+}
+
+type ProductivityDay struct {
+	Date        time.Time   `json:"date"`
+	TotalPoints interface{} `json:"total_points"`
+}
+
+type ProductivityStats struct {
+	ProductivvityPoints TotalAndAveragePoints `json:"productivity_points"`
+	BestProductivityDay ProductivityDay       `json:"best_productivity_day"`
+	ProductivityDays    []ProductivityDay     `json:"productivity_days"`
+}
+
+func databaseProductivityStatsToProductivityStats(productivityStats DatabaseProductivityStats) ProductivityStats {
+	productivityDays := []ProductivityDay{}
+	for _, productivityDay := range productivityStats.ProductivityDays {
+		productivityDays = append(productivityDays, ProductivityDay{Date: productivityDay.Date, TotalPoints: productivityDay.TotalPoints})
+	}
+	totalAveragePoints := TotalAndAveragePoints{
+		TotalPoints:   productivityStats.ProductivityPoints.TotalPoints,
+		AveragePoints: productivityStats.ProductivityPoints.AveragePointsPerDay,
+	}
+	bestProductivityDay := ProductivityDay{
+		Date:        productivityStats.BestProductivityDay.Date,
+		TotalPoints: productivityStats.BestProductivityDay.TotalPoints,
+	}
+	return ProductivityStats{
+		ProductivvityPoints: totalAveragePoints,
+		BestProductivityDay: bestProductivityDay,
+		ProductivityDays:    productivityDays,
+	}
+}
+
+func databaseDailyActivityLogsToDailyActivityLogs(dbdaily []database.GetDailyActivityLogsRow) []DailyActivityLog {
+	dailyActivityLogs := []DailyActivityLog{}
+	for _, dbdaily := range dbdaily {
+		dailyActivityLogs = append(dailyActivityLogs, DailyActivityLog{
+			ActivityID:   dbdaily.ActivityID,
+			Points:       dbdaily.Points,
+			Duration:     dbdaily.Duration,
+			StartTime:    dbdaily.StartTime.Format("15:04"),
+			EndTime:      dbdaily.EndTime.Format("15:04"),
+			ActivityName: dbdaily.ActivityName,
+		})
+	}
+	return dailyActivityLogs
+}
+
+func databaseActivityLogToActivityLog(dbLog database.ActivityLog) ActivityLog {
+	return ActivityLog{
+		ID:         dbLog.ID,
+		UserID:     dbLog.UserID,
+		ActivityID: dbLog.ActivityID,
+		Duration:   dbLog.Duration,
+		Points:     dbLog.Points,
+		LoggedAt:   dbLog.LoggedAt,
+		StartTime:  dbLog.StartTime,
+		EndTime:    dbLog.EndTime,
+	}
+}
+
+func databaseActivityToActivity(dbAccs []database.GetActivitiesRow) []Activity {
+	activities := []Activity{}
+	for _, dbAcc := range dbAccs {
+		activity := Activity{ActivityID: dbAcc.ActivityID, Name: dbAcc.Name, Points: dbAcc.Points, Type: dbAcc.Type}
+		activities = append(activities, activity)
+	}
+	return activities
+}
+
 func databaseUserToUser(dbuser database.User) User {
 	return User{
 		ID:           dbuser.ID,

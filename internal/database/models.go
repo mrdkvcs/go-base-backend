@@ -6,8 +6,40 @@ package database
 
 import (
 	"time"
+
 	"github.com/google/uuid"
 )
+
+type Activity struct {
+	ActivityID uuid.UUID
+	Name       string
+	Points     int32
+	CreatedAt  time.Time
+}
+
+type ActivityLog struct {
+	ID         uuid.UUID
+	UserID     uuid.UUID
+	ActivityID uuid.UUID
+	Duration   int32
+	Points     int32
+	LoggedAt   time.Time
+	StartTime  time.Time
+	EndTime    time.Time
+}
+
+type AllActivity struct {
+	ID   uuid.UUID
+	Type string
+}
+
+type CustomActivity struct {
+	ActivityID uuid.UUID
+	UserID     uuid.UUID
+	Name       string
+	Points     int32
+	CreatedAt  time.Time
+}
 
 type User struct {
 	ID           uuid.UUID
