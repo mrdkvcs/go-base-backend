@@ -136,15 +136,28 @@ func (q *Queries) GetDailyActivityLogs(ctx context.Context, userID uuid.UUID) ([
 	return items, nil
 }
 
-const getDailyActivityPoints = `-- name: GetDailyActivityPoints :one
-SELECT COALESCE(sum(points) , 0)  FROM activity_logs WHERE user_id = $1 AND logged_at::date = CURRENT_DATE
+const getDailyPoints = `-- name: GetDailyPoints :one
+SELECT 
+  COALESCE((SELECT SUM(al.points) 
+            FROM activity_logs al 
+            WHERE al.user_id = $1 
+              AND DATE(al.logged_at) = CURRENT_DATE), 0) AS total_points,
+  COALESCE((SELECT g.goal_points 
+            FROM user_goals g 
+            WHERE g.user_id = $1 
+              AND DATE(g.goal_date) = CURRENT_DATE), 0) AS goal_points
 `
 
-func (q *Queries) GetDailyActivityPoints(ctx context.Context, userID uuid.UUID) (interface{}, error) {
-	row := q.db.QueryRowContext(ctx, getDailyActivityPoints, userID)
-	var coalesce interface{}
-	err := row.Scan(&coalesce)
-	return coalesce, err
+type GetDailyPointsRow struct {
+	TotalPoints interface{}
+	GoalPoints  interface{}
+}
+
+func (q *Queries) GetDailyPoints(ctx context.Context, userID uuid.UUID) (GetDailyPointsRow, error) {
+	row := q.db.QueryRowContext(ctx, getDailyPoints, userID)
+	var i GetDailyPointsRow
+	err := row.Scan(&i.TotalPoints, &i.GoalPoints)
+	return i, err
 }
 
 const setActivityLog = `-- name: SetActivityLog :one

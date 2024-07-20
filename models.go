@@ -58,6 +58,57 @@ type ProductivityStats struct {
 	ProductivityDays    []ProductivityDay     `json:"productivity_days"`
 }
 
+type DailyPoints struct {
+	TotalPoints interface{} `json:"total_points"`
+	GoalPoints  interface{} `json:"goal_points"`
+}
+
+type Team struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"team_name"`
+	TeamIndustry string    `json:"team_industry"`
+	TeamSize     int32     `json:"team_size"`
+	IsPrivate    bool      `json:"is_private"`
+	CreatedBy    uuid.UUID `json:"created_by"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type UserTeams struct {
+	TeamID   uuid.UUID `json:"team_id"`
+	TeamName string    `json:"team_name"`
+	Role     string    `json:"role"`
+}
+
+func databaseUserTeamsToUserTeams(dbuserteams []database.GetUserTeamsRow) []UserTeams {
+	userTeams := []UserTeams{}
+	for _, dbuserteam := range dbuserteams {
+		userTeam := UserTeams{TeamID: dbuserteam.TeamID, TeamName: dbuserteam.TeamName, Role: dbuserteam.Role}
+		userTeams = append(userTeams, userTeam)
+	}
+	return userTeams
+}
+
+func databaseTeamToTeam(dbteam database.Team) Team {
+	return Team{
+		ID:           dbteam.ID,
+		Name:         dbteam.Name,
+		TeamIndustry: dbteam.TeamIndustry,
+		TeamSize:     dbteam.TeamSize,
+		IsPrivate:    dbteam.IsPrivate,
+		CreatedBy:    dbteam.CreatedBy,
+		CreatedAt:    dbteam.CreatedAt,
+		UpdatedAt:    dbteam.UpdatedAt,
+	}
+}
+
+func DatabaseDailyPointsToDailyPoints(DbDailyPoints database.GetDailyPointsRow) DailyPoints {
+	return DailyPoints{
+		TotalPoints: DbDailyPoints.TotalPoints,
+		GoalPoints:  DbDailyPoints.GoalPoints,
+	}
+}
+
 func databaseProductivityStatsToProductivityStats(productivityStats DatabaseProductivityStats) ProductivityStats {
 	productivityDays := []ProductivityDay{}
 	for _, productivityDay := range productivityStats.ProductivityDays {

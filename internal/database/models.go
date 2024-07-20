@@ -41,6 +41,26 @@ type CustomActivity struct {
 	CreatedAt  time.Time
 }
 
+type Team struct {
+	ID           uuid.UUID
+	Name         string
+	TeamIndustry string
+	TeamSize     int32
+	IsPrivate    bool
+	CreatedBy    uuid.UUID
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+type TeamMembership struct {
+	ID        uuid.UUID
+	TeamID    uuid.UUID
+	UserID    uuid.UUID
+	Role      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type User struct {
 	ID           uuid.UUID
 	CreatedAt    time.Time
@@ -49,4 +69,13 @@ type User struct {
 	Email        string
 	PasswordHash string
 	ApiKey       string
+}
+
+type UserGoal struct {
+	ID         uuid.UUID
+	UserID     uuid.UUID
+	GoalDate   time.Time
+	GoalPoints int32
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }

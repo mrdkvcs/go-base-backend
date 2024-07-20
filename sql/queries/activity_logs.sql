@@ -51,5 +51,13 @@ WHERE
     AND al.logged_at::date = CURRENT_DATE;
 
 
--- name: GetDailyActivityPoints :one
-SELECT COALESCE(sum(points) , 0)  FROM activity_logs WHERE user_id = $1 AND logged_at::date = CURRENT_DATE; 
+-- name: GetDailyPoints :one
+SELECT 
+  COALESCE((SELECT SUM(al.points) 
+            FROM activity_logs al 
+            WHERE al.user_id = $1 
+              AND DATE(al.logged_at) = CURRENT_DATE), 0) AS total_points,
+  COALESCE((SELECT g.goal_points 
+            FROM user_goals g 
+            WHERE g.user_id = $1 
+              AND DATE(g.goal_date) = CURRENT_DATE), 0) AS goal_points;

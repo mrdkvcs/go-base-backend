@@ -15,6 +15,11 @@ type apiConfig struct {
 	DB *database.Queries
 }
 
+var db *sql.DB
+var totalPoints int32 = 0
+var goalPoints int32 = 0
+var stopChan chan struct{} = make(chan struct{})
+
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -28,7 +33,7 @@ func main() {
 	if dbUrl == "" {
 		fmt.Println("Could not find database url in .env file")
 	}
-	db, err := sql.Open("postgres", dbUrl)
+	db, err = sql.Open("postgres", dbUrl)
 	if err != nil {
 		fmt.Println("Could not connect to database")
 	}
@@ -51,8 +56,11 @@ func main() {
 	router.HandleFunc("DELETE /activities/{id}", apiConfig.DeleteActivity)
 	router.HandleFunc("POST /activitieslog", apiConfig.middlewareAuth(apiConfig.SetActivityLog))
 	router.HandleFunc("GET /dailyactivitylogs", apiConfig.middlewareAuth(apiConfig.GetDailyActivityLogs))
-	router.HandleFunc("GET /dailyactivitypoints", apiConfig.middlewareAuth(apiConfig.GetDailyActivityPoints))
+	router.HandleFunc("GET /dailypoints", apiConfig.middlewareAuth(apiConfig.GetDailyPoints))
 	router.HandleFunc("POST /productivitystats", apiConfig.middlewareAuth(apiConfig.GetProductivityStats))
+	router.HandleFunc("POST /productivitygoals", apiConfig.middlewareAuth(apiConfig.SetProductivityGoal))
+	router.HandleFunc("POST /teams", apiConfig.middlewareAuth(apiConfig.CreateTeam))
+	router.HandleFunc("GET /teams", apiConfig.middlewareAuth(apiConfig.GetUserTeams))
 	handler := corsMw.Wrap(router)
 	fmt.Println("Server running on port: " + port)
 	http.ListenAndServe(":"+port, handler)

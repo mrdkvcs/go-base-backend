@@ -55,6 +55,10 @@ func (apiCfg *apiConfig) SetActivityLog(w http.ResponseWriter, r *http.Request, 
 		respondWithError(w, 400, fmt.Sprintf("Error setting activity log: %v", err))
 		return
 	}
+	totalPoints = totalPoints + activityLog.Points
+	if totalPoints > goalPoints && goalPoints != 0 {
+		close(stopChan)
+	}
 	respondWithJson(w, 200, databaseActivityLogToActivityLog(activityLog))
 }
 
@@ -67,11 +71,11 @@ func (apiCfg *apiConfig) GetDailyActivityLogs(w http.ResponseWriter, r *http.Req
 	respondWithJson(w, 200, databaseDailyActivityLogsToDailyActivityLogs(activityDailyLogs))
 }
 
-func (apiCfg *apiConfig) GetDailyActivityPoints(w http.ResponseWriter, r *http.Request, user database.User) {
-	points, err := apiCfg.DB.GetDailyActivityPoints(r.Context(), user.ID)
+func (apiCfg *apiConfig) GetDailyPoints(w http.ResponseWriter, r *http.Request, user database.User) {
+	points, err := apiCfg.DB.GetDailyPoints(r.Context(), user.ID)
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Error getting daily activity points: %v", err))
 		return
 	}
-	respondWithJson(w, 200, points)
+	respondWithJson(w, 200, DatabaseDailyPointsToDailyPoints(points))
 }
