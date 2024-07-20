@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 	"github.com/mrdkvcs/go-base-backend/internal/database"
 	"net/http"
 	"net/smtp"
+	"os"
 	"sync"
 	"time"
 )
@@ -82,9 +84,20 @@ func sendUserReminder(userEmail string) {
 }
 
 func sendEmail(userEmail string, goalPoints, totalPoints int32) {
-	from := "noreplyhabittrackerapp@gmail.com"
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("Error loading .env file")
+		return
+	}
+	from := os.Getenv("SMTP_USER")
+	if from == "" {
+		fmt.Println("Couldnt get username from .env file")
+	}
+	password := os.Getenv("SMTP_PASSWORD")
+	if password == "" {
+		fmt.Println("Couldnt get password from .env file")
+	}
 	body := ""
-	password := "qzca cqze kgoo bzmr"
 	to := userEmail
 	subject := "Productivity Goal Reminder"
 	body = fmt.Sprintf("Hello,\n\nYou are currently  below your productivity goal for the day.\nYour total daily points : %d\nYour goal points: %d\n\nKeep pushing to reach your target!\n\nBest regards,\nYour Productivity Tracker",
@@ -93,7 +106,7 @@ func sendEmail(userEmail string, goalPoints, totalPoints int32) {
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
 	auth := smtp.PlainAuth("", from, password, smtpHost)
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, []byte(message))
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, []byte(message))
 	if err != nil {
 		fmt.Printf("error sending email: %v", err)
 	} else {

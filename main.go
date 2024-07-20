@@ -22,6 +22,7 @@ var stopChan chan struct{} = make(chan struct{})
 
 func main() {
 	err := godotenv.Load(".env")
+	username := os.Getenv("SMTP_USER")
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
