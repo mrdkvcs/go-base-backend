@@ -22,7 +22,6 @@ var stopChan chan struct{} = make(chan struct{})
 
 func main() {
 	err := godotenv.Load(".env")
-	username := os.Getenv("SMTP_USER")
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
@@ -62,6 +61,8 @@ func main() {
 	router.HandleFunc("POST /productivitygoals", apiConfig.middlewareAuth(apiConfig.SetProductivityGoal))
 	router.HandleFunc("POST /teams", apiConfig.middlewareAuth(apiConfig.CreateTeam))
 	router.HandleFunc("GET /teams", apiConfig.middlewareAuth(apiConfig.GetUserTeams))
+	router.HandleFunc("GET /teaminfo/{teamid}", apiConfig.GetTeamInfo)
+	router.HandleFunc("GET /teamactivities/{teamid}", apiConfig.GetTeamActivities)
 	handler := corsMw.Wrap(router)
 	fmt.Println("Server running on port: " + port)
 	http.ListenAndServe(":"+port, handler)

@@ -80,6 +80,42 @@ type UserTeams struct {
 	Role     string    `json:"role"`
 }
 
+type TeamInfo struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"team_name"`
+	TeamIndustry string    `json:"team_industry"`
+	TeamSize     int32     `json:"team_size"`
+	IsPrivate    bool      `json:"is_private"`
+	CreatedBy    uuid.UUID `json:"created_by"`
+	Owner        string    `json:"owner"`
+}
+
+type TeamActivity struct {
+	ActivityName string `json:"activity_name"`
+	Points       int32  `json:"points"`
+}
+
+func databaseTeamActivityToTeamActivity(dbteamactivities []database.GetTeamActivitiesRow) []TeamActivity {
+	teamactivities := []TeamActivity{}
+	for _, dbteamactivity := range dbteamactivities {
+		teamactivity := TeamActivity{ActivityName: dbteamactivity.ActivityName, Points: dbteamactivity.Points}
+		teamactivities = append(teamactivities, teamactivity)
+	}
+	return teamactivities
+}
+
+func databaseTeamInfoToTeamInfo(dbteam database.GetTeamInFoRow) TeamInfo {
+	return TeamInfo{
+		ID:           dbteam.ID,
+		Name:         dbteam.Name,
+		TeamIndustry: dbteam.TeamIndustry,
+		TeamSize:     dbteam.TeamSize,
+		IsPrivate:    dbteam.IsPrivate,
+		CreatedBy:    dbteam.CreatedBy,
+		Owner:        dbteam.Username,
+	}
+}
+
 func databaseUserTeamsToUserTeams(dbuserteams []database.GetUserTeamsRow) []UserTeams {
 	userTeams := []UserTeams{}
 	for _, dbuserteam := range dbuserteams {

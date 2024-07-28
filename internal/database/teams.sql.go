@@ -68,6 +68,72 @@ func (q *Queries) CreateTeamMembership(ctx context.Context, arg CreateTeamMember
 	return err
 }
 
+const getTeamActivities = `-- name: GetTeamActivities :many
+SELECT activity_name, points FROM team_activities WHERE team_id = $1
+`
+
+type GetTeamActivitiesRow struct {
+	ActivityName string
+	Points       int32
+}
+
+func (q *Queries) GetTeamActivities(ctx context.Context, teamID uuid.UUID) ([]GetTeamActivitiesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTeamActivities, teamID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTeamActivitiesRow
+	for rows.Next() {
+		var i GetTeamActivitiesRow
+		if err := rows.Scan(&i.ActivityName, &i.Points); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTeamInFo = `-- name: GetTeamInFo :one
+
+SELECT t.id ,  t.name , t.team_industry , t.team_size , t.is_private  , t.created_by , u.username 
+FROM 
+teams t
+JOIN users u ON u.id = t.created_by
+WHERE t.id = $1
+`
+
+type GetTeamInFoRow struct {
+	ID           uuid.UUID
+	Name         string
+	TeamIndustry string
+	TeamSize     int32
+	IsPrivate    bool
+	CreatedBy    uuid.UUID
+	Username     string
+}
+
+func (q *Queries) GetTeamInFo(ctx context.Context, id uuid.UUID) (GetTeamInFoRow, error) {
+	row := q.db.QueryRowContext(ctx, getTeamInFo, id)
+	var i GetTeamInFoRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.TeamIndustry,
+		&i.TeamSize,
+		&i.IsPrivate,
+		&i.CreatedBy,
+		&i.Username,
+	)
+	return i, err
+}
+
 const getUserTeams = `-- name: GetUserTeams :many
 
 SELECT 

@@ -55,3 +55,33 @@ func (apiCfg *apiConfig) GetUserTeams(w http.ResponseWriter, r *http.Request, us
 	}
 	respondWithJson(w, 200, databaseUserTeamsToUserTeams(userteams))
 }
+
+func (apiCfg *apiConfig) GetTeamInfo(w http.ResponseWriter, r *http.Request) {
+	teamId := r.PathValue("teamid")
+	parsedTeamUUID, err := uuid.Parse(teamId)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Error in parsing uuid: %s", err))
+		return
+	}
+	team, err := apiCfg.DB.GetTeamInFo(r.Context(), parsedTeamUUID)
+	if err != nil {
+		respondWithError(w, 500, fmt.Sprintf("Error in getting user teams: %s", err))
+		return
+	}
+	respondWithJson(w, 200, databaseTeamInfoToTeamInfo(team))
+}
+
+func (apiCfg *apiConfig) GetTeamActivities(w http.ResponseWriter, r *http.Request) {
+	teamId := r.PathValue("teamid")
+	parsedTeamUUID, err := uuid.Parse(teamId)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Error in parsing uuid: %s", err))
+		return
+	}
+	teamactivities, err := apiCfg.DB.GetTeamActivities(r.Context(), parsedTeamUUID)
+	if err != nil {
+		respondWithError(w, 500, fmt.Sprintf("Error in getting  team activites: %s", err))
+		return
+	}
+	respondWithJson(w, 200, databaseTeamActivityToTeamActivity(teamactivities))
+}

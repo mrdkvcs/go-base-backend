@@ -17,4 +17,14 @@ JOIN
 WHERE 
     tm.user_id = $1;
 
+-- name: GetTeamInFo :one
+
+SELECT t.id ,  t.name , t.team_industry , t.team_size , t.is_private  , t.created_by , u.username 
+FROM 
+teams t
+JOIN users u ON u.id = t.created_by
+WHERE t.id = $1;
+
+-- name: GetTeamActivities :many
+SELECT activity_name, points FROM team_activities WHERE team_id = $1;
 

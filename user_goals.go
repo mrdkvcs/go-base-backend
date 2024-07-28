@@ -52,7 +52,7 @@ func startGoalTracker(userId uuid.UUID, userEmail string) {
 	if ticker, exists := tickers[userId]; exists {
 		ticker.Stop()
 	}
-	ticker := time.NewTicker(2 * time.Minute)
+	ticker := time.NewTicker(3 * time.Hour)
 	mu.Lock()
 	tickers[userId] = ticker
 	mu.Unlock()

@@ -52,6 +52,16 @@ type Team struct {
 	UpdatedAt    time.Time
 }
 
+type TeamActivity struct {
+	ID           uuid.UUID
+	TeamID       uuid.UUID
+	ActivityName string
+	ActivityRole string
+	Points       int32
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
 type TeamMembership struct {
 	ID        uuid.UUID
 	TeamID    uuid.UUID
